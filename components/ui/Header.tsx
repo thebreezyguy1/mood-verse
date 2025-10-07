@@ -9,6 +9,10 @@ const Header = (props: headerProps) => {
     <View style={styles.container}>
       <Image />
       <Text style={{ fontSize: 20, fontWeight: "700" }}>{props.title}</Text>
+      <View>
+        <Image />
+        <Text>{new Date().toDateString()}</Text>
+      </View>
     </View>
   );
 };
@@ -17,10 +21,11 @@ const styles = StyleSheet.create({
   container: {
     height: 100,
     width: "100%",
-    flexDirection: "row",
+    flexDirection: "column",
     backgroundColor: "pink",
-    alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: 20,
+    gap: 5,
   },
 });
 
