@@ -7,12 +7,14 @@ import { StatusBar } from "expo-status-bar";
 export default function RootLayout() {
   return (
     <React.Fragment>
-      <StatusBar style="auto" />
-      <Tabs screenOptions={{ tabBarActiveTintColor: "teal" }}>
+      <StatusBar style="auto" backgroundColor="#FF69B4" />
+      <Tabs screenOptions={{ tabBarActiveTintColor: "pink" }}>
         <Tabs.Screen
           name="index"
           options={{
             title: "Home",
+            headerShown: false,
+
             tabBarIcon: ({ color, size }) => {
               return (
                 <MaterialCommunityIcons name="home" size={size} color={color} />
@@ -24,6 +26,7 @@ export default function RootLayout() {
           name="chat"
           options={{
             title: "Chat",
+            headerShown: false,
             tabBarIcon: ({ color, size }) => {
               return (
                 <MaterialCommunityIcons name="chat" size={size} color={color} />
@@ -35,6 +38,7 @@ export default function RootLayout() {
           name="bookmarks"
           options={{
             title: "Bookmarks",
+            headerShown: false,
             tabBarIcon: ({ color, size }) => {
               return (
                 <MaterialCommunityIcons
@@ -50,6 +54,7 @@ export default function RootLayout() {
           name="settings"
           options={{
             title: "Settings",
+            headerShown: false,
             tabBarIcon: ({ color, size }) => {
               return (
                 <MaterialCommunityIcons

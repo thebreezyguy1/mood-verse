@@ -12,9 +12,13 @@ const HomeCard = (props: homeCardProps) => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text>{props.title}</Text>
-        <Text>{props.verseText}</Text>
-        <Text>{props.verse}</Text>
+        <Text style={styles.title}>{props.title}</Text>
+        <Text style={{ fontStyle: "italic", marginBottom: 5 }}>
+          {props.verseText}
+        </Text>
+        <Text style={{ textAlign: "right", paddingRight: 10 }}>
+          {props.verse}
+        </Text>
       </View>
       <View style={styles.actions}>
         <Pressable>
@@ -38,7 +42,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderWidth: 1,
     borderRadius: 10,
+    borderColor: "pink",
     padding: 10,
+    backgroundColor: "pink",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    elevation: 8,
   },
   content: {
     marginBottom: 5,
@@ -46,5 +57,11 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: "row",
     justifyContent: "center",
+    gap: 30,
+  },
+  title: {
+    marginBottom: 5,
+    fontSize: 20,
+    fontWeight: "700",
   },
 });
