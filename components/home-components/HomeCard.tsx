@@ -12,23 +12,23 @@ const HomeCard = (props: homeCardProps) => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>{props.title}</Text>
-        <Text style={{ fontStyle: "italic", marginBottom: 5 }}>
+        <View style={styles.header}>
+          <Text style={styles.title}>{props.title}</Text>
+          <Text>{props.verse}</Text>
+        </View>
+        <Text style={{ fontStyle: "italic", marginBottom: 5, fontSize: 13 }}>
           {props.verseText}
-        </Text>
-        <Text style={{ textAlign: "right", paddingRight: 10 }}>
-          {props.verse}
         </Text>
       </View>
       <View style={styles.actions}>
         <Pressable>
-          <MaterialCommunityIcons name="share" size={24} color="black" />
+          <MaterialCommunityIcons name="share" size={20} color="black" />
         </Pressable>
         <Pressable>
-          <MaterialCommunityIcons name="content-copy" size={24} color="black" />
+          <MaterialCommunityIcons name="content-copy" size={20} color="black" />
         </Pressable>
         <Pressable>
-          <MaterialCommunityIcons name="bookmark" size={24} color="black" />
+          <MaterialCommunityIcons name="bookmark" size={20} color="black" />
         </Pressable>
       </View>
     </View>
@@ -61,7 +61,12 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: 5,
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "700",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });
