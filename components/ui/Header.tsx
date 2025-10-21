@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type headerProps = {
@@ -5,9 +6,14 @@ type headerProps = {
 };
 
 const Header = (props: headerProps) => {
+  const router = useRouter();
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity>
+      <TouchableOpacity
+        accessibilityRole="button"
+        onPress={() => router.push("/profile")}
+      >
         <Image
           style={styles.profileImg}
           source={require("../../assets/images/dorian-img.jpg")}
