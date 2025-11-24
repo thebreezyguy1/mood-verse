@@ -1,7 +1,7 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, Share, StyleSheet, Text, View } from "react-native";
 
 type homeCardProps = {
   title: string;
@@ -19,6 +19,17 @@ const HomeCard = (props: homeCardProps) => {
     }
   };
 
+  const handleShare = async (message: string) => {
+    try {
+      await Share.share({
+        title: "My Daily Verse",
+        message: message,
+      });
+    } catch (error: any) {
+      Alert.alert("Share Error", error.message);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -31,7 +42,9 @@ const HomeCard = (props: homeCardProps) => {
         </Text>
       </View>
       <View style={styles.actions}>
-        <Pressable>
+        <Pressable
+          onPress={() => handleShare(props.verse + " - " + props.verseText)}
+        >
           <MaterialCommunityIcons name="share" size={20} color="black" />
         </Pressable>
         <Pressable
