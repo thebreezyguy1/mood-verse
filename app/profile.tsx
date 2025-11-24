@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView edges={["top"]} style={styles.container}>
       <View style={{ flex: 1 }}>
         <View style={styles.headerBar}>
           <TouchableOpacity
@@ -70,7 +71,7 @@ export default function ProfileScreen() {
           <Text>Edit Profile</Text>
         </TouchableOpacity>
       </Link>
-    </View>
+    </SafeAreaView>
   );
 }
 

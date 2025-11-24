@@ -2,13 +2,23 @@ import { Tabs } from "expo-router";
 import React from "react";
 
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { StatusBar } from "expo-status-bar";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RootLayout() {
   return (
-    <React.Fragment>
-      <StatusBar style="auto" backgroundColor="#FF69B4" />
-      <Tabs screenOptions={{ tabBarActiveTintColor: "pink" }}>
+    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: "pink" }}>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: "#FFC0CB",
+          tabBarInactiveTintColor: "#c2c2c2",
+          tabBarStyle: {
+            backgroundColor: "#fff",
+            borderTopWidth: 1,
+            borderTopColor: "#fff",
+          },
+        }}
+      >
         <Tabs.Screen
           name="index"
           options={{
@@ -67,7 +77,7 @@ export default function RootLayout() {
           }}
         />
       </Tabs>
-    </React.Fragment>
+    </SafeAreaView>
     // <Tabs
     //   screenOptions={{
     //     tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,

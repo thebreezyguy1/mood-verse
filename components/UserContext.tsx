@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { CountryCode } from "react-native-country-picker-modal";
+// removed dependency on `react-native-country-picker-modal`; use `string` for country codes
 
 type User = {
   firstName: string;
@@ -9,7 +9,7 @@ type User = {
   streetAddress2: string;
   city: string;
   zipCode: string;
-  countrycode: CountryCode;
+  countrycode: string;
   phone: string;
 };
 

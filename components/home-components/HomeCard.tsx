@@ -1,6 +1,7 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import * as Clipboard from "expo-clipboard";
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
 type homeCardProps = {
   title: string;
@@ -9,6 +10,15 @@ type homeCardProps = {
 };
 
 const HomeCard = (props: homeCardProps) => {
+  const handleCopy = async (text: string) => {
+    try {
+      await Clipboard.setStringAsync(text);
+      Alert.alert("Copied!", "Verse copied to clipboard!");
+    } catch (err) {
+      Alert.alert("Copy failed", "Unable to copy verse to clipboard.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -24,7 +34,9 @@ const HomeCard = (props: homeCardProps) => {
         <Pressable>
           <MaterialCommunityIcons name="share" size={20} color="black" />
         </Pressable>
-        <Pressable>
+        <Pressable
+          onPress={() => handleCopy(props.verse + " - " + props.verseText)}
+        >
           <MaterialCommunityIcons name="content-copy" size={20} color="black" />
         </Pressable>
         <Pressable>
