@@ -143,9 +143,12 @@ export default function homeScreen() {
             return (
               <HomeCard
                 key={key}
+                book_name={data.book_name}
+                book={data.book}
+                chapter={data.chapter}
+                verse={data.verse}
                 title={data.title}
-                verseText={data.text}
-                verse={data.book_name + ", " + data.chapter + ":" + data.verse}
+                text={data.text}
               />
             );
           })}

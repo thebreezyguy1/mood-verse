@@ -6,12 +6,8 @@ export interface Verse {
   text: string;
 }
 
-export interface Bookmark {
-  book_name: string;
-  book: number;
-  chapter: number;
-  verse: number;
-  text: string;
+export interface Bookmark extends Verse {
+  id: string;
   date: string;
 }
 

@@ -1,15 +1,74 @@
+import { Bookmark, DailyVerse } from "@/types/types";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Clipboard from "expo-clipboard";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, Pressable, Share, StyleSheet, Text, View } from "react-native";
 
-type homeCardProps = {
-  title: string;
-  verse: string;
-  verseText: string;
-};
+const HomeCard = ({
+  book_name,
+  book,
+  chapter,
+  verse,
+  title,
+  text,
+}: DailyVerse) => {
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const BOOKMARKS_STORAGE_KEY = "@MoodVerse:Bookmarks";
 
-const HomeCard = (props: homeCardProps) => {
+  const getVerseId = () => {
+    return `${book_name}-${chapter}-${verse}`;
+  };
+
+  const getBookmarks = async (): Promise<Bookmark[]> => {
+    const jsonValue = await AsyncStorage.getItem(BOOKMARKS_STORAGE_KEY);
+    return jsonValue != null ? JSON.parse(jsonValue) : [];
+  };
+
+  const saveBookmarks = async (currentBookmarks: Bookmark[]) => {
+    const jsonValue = JSON.stringify(currentBookmarks);
+    await AsyncStorage.setItem(BOOKMARKS_STORAGE_KEY, jsonValue);
+  };
+
+  const addBookmark = async () => {
+    const currentBookmarks = await getBookmarks();
+    const id = getVerseId();
+
+    if (currentBookmarks.some((b) => b.id === id)) {
+      Alert.alert("Already Bookmarked", "This verse is already bookmarked.");
+      return;
+    }
+
+    const newBookmark: Bookmark = {
+      id: id,
+      date: new Date().toISOString(),
+      book_name: book_name,
+      book: book,
+      chapter: chapter,
+      verse: verse,
+      text: text,
+    };
+    const updatedBookmarks = [newBookmark, ...currentBookmarks];
+    await saveBookmarks(updatedBookmarks);
+    setIsBookmarked(true);
+    Alert.alert("Success", "Verse added to bookmarks!");
+  };
+
+  const removeBookmark = async () => {
+    try {
+      const currentBookmarks = await getBookmarks();
+      const id = getVerseId();
+
+      const updatedBookmarks = currentBookmarks.filter((b) => b.id !== id);
+      await saveBookmarks(updatedBookmarks);
+      setIsBookmarked(false);
+      Alert.alert("Removed", "Verse removed from bookmarks!");
+    } catch (e) {
+      console.error("Failed to remove bookmark:", e);
+      Alert.alert("Error", "Could not remove bookmark.");
+    }
+  };
+
   const handleCopy = async (text: string) => {
     try {
       await Clipboard.setStringAsync(text);
@@ -30,30 +89,52 @@ const HomeCard = (props: homeCardProps) => {
     }
   };
 
+  useEffect(() => {
+    const checkBookmarkStatus = async () => {
+      try {
+        const bookmarks = await getBookmarks();
+        const id = getVerseId();
+        const isMarked = bookmarks.some((b) => b.id === id);
+        setIsBookmarked(isMarked);
+      } catch (error) {
+        console.error("Error checking bookmark status:", error);
+      }
+    };
+    checkBookmarkStatus();
+  }, [book_name, chapter, verse]);
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.title}>{props.title}</Text>
-          <Text>{props.verse}</Text>
+          <Text style={styles.title}>{title}</Text>
+          <Text>{`${book_name}, ${chapter}: ${verse}`}</Text>
         </View>
         <Text style={{ fontStyle: "italic", marginBottom: 5, fontSize: 13 }}>
-          {props.verseText}
+          {text}
         </Text>
       </View>
       <View style={styles.actions}>
         <Pressable
-          onPress={() => handleShare(props.verse + " - " + props.verseText)}
+          onPress={() =>
+            handleShare(`${book_name}, ${chapter}: ${verse} - ${text}`)
+          }
         >
           <MaterialCommunityIcons name="share" size={20} color="black" />
         </Pressable>
         <Pressable
-          onPress={() => handleCopy(props.verse + " - " + props.verseText)}
+          onPress={() =>
+            handleCopy(`${book_name}, ${chapter}: ${verse} - ${text}`)
+          }
         >
           <MaterialCommunityIcons name="content-copy" size={20} color="black" />
         </Pressable>
-        <Pressable>
-          <MaterialCommunityIcons name="bookmark" size={20} color="black" />
+        <Pressable onPress={isBookmarked ? removeBookmark : addBookmark}>
+          <MaterialCommunityIcons
+            name={isBookmarked ? "bookmark-off" : "bookmark"}
+            size={20}
+            color="black"
+          />
         </Pressable>
       </View>
     </View>
