@@ -1,9 +1,11 @@
+import SearchFilterModal from "@/components/SearchFillterModal";
 import Header from "@/components/ui/Header";
-import { Bookmark } from "@/types/types";
+import { useBookmarks } from "@/context/BookmarksContext";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Clipboard from "expo-clipboard";
-import { useEffect, useState } from "react";
+import * as Clipboard from "expo-clipboard";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -11,6 +13,7 @@ import {
   Share,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -22,9 +25,14 @@ type bookmarkProps = {
   itemId: string;
 };
 
+export type FilterType = "text" | "title";
+
 export default function bookmarksScreen() {
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { bookmarks, isLoading, removeBookmark, refreshBookmarks } =
+    useBookmarks();
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+  const [activeFilterType, setActiveFilterType] = useState<FilterType>("text");
+
   // const bookmarks = [
   //   {
   //     id: "1",
@@ -42,46 +50,12 @@ export default function bookmarksScreen() {
   //   },
   // ];
 
-  const BOOKMARKS_STORAGE_KEY = "@MoodVerse:Bookmarks";
-
-  const getBookmarks = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem(BOOKMARKS_STORAGE_KEY);
-      if (jsonValue !== null) {
-        setBookmarks(JSON.parse(jsonValue));
-      } else {
-        setBookmarks([]);
-      }
-    } catch (e) {
-      console.error("Error loading bookmarks:", e);
-      Alert.alert("Error", "Could not load saved bookmarks.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const saveBookmarks = async (currentBookmarks: Bookmark[]) => {
-    try {
-      const jsonValue = JSON.stringify(currentBookmarks);
-      await AsyncStorage.setItem(BOOKMARKS_STORAGE_KEY, jsonValue);
-    } catch (e) {
-      console.error("Error saving bookmarks:", e);
-    }
-  };
-
-  const removeBookmark = async (id: string) => {
-    const updatedBookmarks = bookmarks.filter((b) => b.id !== id);
-    setBookmarks(updatedBookmarks);
-    saveBookmarks(updatedBookmarks);
-    Alert.alert("Removed", "Bookmark successfully removed.");
-  };
-
   const handleCopy = async (text: string) => {
     try {
       await Clipboard.setStringAsync(text);
       Alert.alert("Copied!", "Verse copied to clipboard!");
     } catch (err) {
-      Alert.alert("Copy failed", "Unable to copy verse to clipboard.");
+      Alert.alert("Copy failed", "Unable to copy verse to clipboard:");
     }
   };
 
@@ -96,23 +70,23 @@ export default function bookmarksScreen() {
     }
   };
 
-  useEffect(() => {
-    getBookmarks();
-  }, []);
+  const handleRemoveBookmark = (id: string) => {
+    removeBookmark(id);
+  };
 
-  // const STORAGE_KEYS = {
-  //   bookmarks: "@MoodVerse:bookmarks",
-  // };
+  useFocusEffect(
+    useCallback(() => {
+      refreshBookmarks();
+    }, [refreshBookmarks])
+  );
 
-  // const getBookmarks = async () => {
-  //   try {
-  //     const storedbookmarks = await AsyncStorage.getItem(
-  //       STORAGE_KEYS.bookmarks
-  //     );
-  //     let bookmarkObj: any = null
-  //     bookmarkObj.
-  //   } catch (error) {}
-  // };
+  const openFilterModal = () => {
+    setIsFilterModalVisible(true);
+  };
+
+  const handleFilterSelect = (filterType: FilterType) => {
+    setActiveFilterType(filterType);
+  };
 
   const Bookmark = ({ verse, date, verseText, itemId }: bookmarkProps) => {
     return (
@@ -136,7 +110,7 @@ export default function bookmarksScreen() {
             />
           </Pressable>
 
-          <TouchableOpacity onPress={() => removeBookmark(itemId)}>
+          <TouchableOpacity onPress={() => handleRemoveBookmark(itemId)}>
             <MaterialCommunityIcons
               name="bookmark-off"
               size={20}
@@ -157,19 +131,41 @@ export default function bookmarksScreen() {
       ) : (
         <View style={styles.bookmarksInnerContainer}>
           {bookmarks.length > 0 ? (
-            <FlatList
-              data={bookmarks}
-              renderItem={({ item }) => (
-                <Bookmark
-                  verse={`${item.book_name}, ${item.chapter}: ${item.verse}`}
-                  date={item.date}
-                  verseText={item.text}
-                  itemId={item.id}
+            <>
+              <View style={styles.searchContainer}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search a bookmark..."
                 />
-              )}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={styles.listContainer}
-            />
+                <Pressable onPress={openFilterModal}>
+                  <FontAwesome name="filter" size={18} color="#c2c2c2" />
+                </Pressable>
+                <MaterialCommunityIcons
+                  name="sort-calendar-ascending"
+                  size={20}
+                  color="#c2c2c2"
+                />
+              </View>
+              <FlatList
+                data={bookmarks}
+                renderItem={({ item }) => (
+                  <Bookmark
+                    verse={`${item.book_name}, ${item.chapter}: ${item.verse}`}
+                    date={item.date}
+                    verseText={item.text}
+                    itemId={item.id}
+                  />
+                )}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={styles.listContainer}
+              />
+              <SearchFilterModal
+                isVisible={isFilterModalVisible}
+                onClose={() => setIsFilterModalVisible(false)}
+                onApplyFilter={handleFilterSelect}
+                currentFilter={activeFilterType}
+              />
+            </>
           ) : (
             <View style={styles.bookmarksEmptyContainer}>
               <MaterialCommunityIcons
@@ -256,5 +252,20 @@ const styles = StyleSheet.create({
     marginTop: 50,
     fontSize: 16,
     color: "#888",
+  },
+  searchContainer: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 20,
+    marginHorizontal: 20,
+    alignItems: "center",
+  },
+  searchInput: {
+    flex: 1,
+    borderWidth: 1,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    borderColor: "#c2c2c2",
   },
 });

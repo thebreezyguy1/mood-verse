@@ -1,8 +1,8 @@
-import { Bookmark, DailyVerse } from "@/types/types";
+import { useBookmarks } from "@/context/BookmarksContext";
+import { DailyVerse } from "@/types/types";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Clipboard from "expo-clipboard";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Alert, Pressable, Share, StyleSheet, Text, View } from "react-native";
 
 const HomeCard = ({
@@ -13,59 +13,24 @@ const HomeCard = ({
   title,
   text,
 }: DailyVerse) => {
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const BOOKMARKS_STORAGE_KEY = "@MoodVerse:Bookmarks";
+  const { isVerseBookmarked, addBookmark, removeBookmark } = useBookmarks();
 
-  const getVerseId = () => {
-    return `${book_name}-${chapter}-${verse}`;
-  };
+  const verseId = `${book}-${chapter}-${verse}`;
+  const isBookmarked = isVerseBookmarked(verseId);
 
-  const getBookmarks = async (): Promise<Bookmark[]> => {
-    const jsonValue = await AsyncStorage.getItem(BOOKMARKS_STORAGE_KEY);
-    return jsonValue != null ? JSON.parse(jsonValue) : [];
-  };
-
-  const saveBookmarks = async (currentBookmarks: Bookmark[]) => {
-    const jsonValue = JSON.stringify(currentBookmarks);
-    await AsyncStorage.setItem(BOOKMARKS_STORAGE_KEY, jsonValue);
-  };
-
-  const addBookmark = async () => {
-    const currentBookmarks = await getBookmarks();
-    const id = getVerseId();
-
-    if (currentBookmarks.some((b) => b.id === id)) {
-      Alert.alert("Already Bookmarked", "This verse is already bookmarked.");
-      return;
-    }
-
-    const newBookmark: Bookmark = {
-      id: id,
-      date: new Date().toISOString(),
-      book_name: book_name,
-      book: book,
-      chapter: chapter,
-      verse: verse,
-      text: text,
-    };
-    const updatedBookmarks = [newBookmark, ...currentBookmarks];
-    await saveBookmarks(updatedBookmarks);
-    setIsBookmarked(true);
-    Alert.alert("Success", "Verse added to bookmarks!");
-  };
-
-  const removeBookmark = async () => {
-    try {
-      const currentBookmarks = await getBookmarks();
-      const id = getVerseId();
-
-      const updatedBookmarks = currentBookmarks.filter((b) => b.id !== id);
-      await saveBookmarks(updatedBookmarks);
-      setIsBookmarked(false);
-      Alert.alert("Removed", "Verse removed from bookmarks!");
-    } catch (e) {
-      console.error("Failed to remove bookmark:", e);
-      Alert.alert("Error", "Could not remove bookmark.");
+  const handleBookmarkToggle = () => {
+    if (isBookmarked) {
+      removeBookmark(verseId);
+    } else {
+      const item: DailyVerse = {
+        book_name: book_name,
+        book: book,
+        chapter: chapter,
+        verse: verse,
+        title: title,
+        text: text,
+      };
+      addBookmark(item);
     }
   };
 
@@ -88,20 +53,6 @@ const HomeCard = ({
       Alert.alert("Share Error", error.message);
     }
   };
-
-  useEffect(() => {
-    const checkBookmarkStatus = async () => {
-      try {
-        const bookmarks = await getBookmarks();
-        const id = getVerseId();
-        const isMarked = bookmarks.some((b) => b.id === id);
-        setIsBookmarked(isMarked);
-      } catch (error) {
-        console.error("Error checking bookmark status:", error);
-      }
-    };
-    checkBookmarkStatus();
-  }, [book_name, chapter, verse]);
 
   return (
     <View style={styles.container}>
@@ -129,7 +80,7 @@ const HomeCard = ({
         >
           <MaterialCommunityIcons name="content-copy" size={20} color="black" />
         </Pressable>
-        <Pressable onPress={isBookmarked ? removeBookmark : addBookmark}>
+        <Pressable onPress={handleBookmarkToggle}>
           <MaterialCommunityIcons
             name={isBookmarked ? "bookmark-off" : "bookmark"}
             size={20}

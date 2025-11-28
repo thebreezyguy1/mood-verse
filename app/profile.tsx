@@ -1,4 +1,4 @@
-import { useUser } from "@/components/UserContext";
+import { useUser } from "@/context/UserContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Link, useRouter } from "expo-router";

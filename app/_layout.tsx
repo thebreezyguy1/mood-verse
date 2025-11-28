@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 
-import { UserProvider } from "@/components/UserContext";
+import { UserProvider } from "@/context/UserContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function RootLayout() {
