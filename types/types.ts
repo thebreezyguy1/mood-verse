@@ -6,11 +6,11 @@ export interface Verse {
   text: string;
 }
 
-export interface Bookmark extends Verse {
-  id: string;
-  date: string;
-}
-
 export interface DailyVerse extends Verse {
   title: string;
+}
+
+export interface Bookmark extends DailyVerse {
+  id: string;
+  date: string;
 }

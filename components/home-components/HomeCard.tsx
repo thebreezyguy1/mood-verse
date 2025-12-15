@@ -59,7 +59,7 @@ const HomeCard = ({
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>{title}</Text>
-          <Text>{`${book_name}, ${chapter}: ${verse}`}</Text>
+          <Text>{`${book_name}, ${chapter}:${verse}`}</Text>
         </View>
         <Text style={{ fontStyle: "italic", marginBottom: 5, fontSize: 13 }}>
           {text}
@@ -68,14 +68,14 @@ const HomeCard = ({
       <View style={styles.actions}>
         <Pressable
           onPress={() =>
-            handleShare(`${book_name}, ${chapter}: ${verse} - ${text}`)
+            handleShare(`${book_name}, ${chapter}:${verse} - ${text}`)
           }
         >
           <MaterialCommunityIcons name="share" size={20} color="black" />
         </Pressable>
         <Pressable
           onPress={() =>
-            handleCopy(`${book_name}, ${chapter}: ${verse} - ${text}`)
+            handleCopy(`${book_name}, ${chapter}:${verse} - ${text}`)
           }
         >
           <MaterialCommunityIcons name="content-copy" size={20} color="black" />

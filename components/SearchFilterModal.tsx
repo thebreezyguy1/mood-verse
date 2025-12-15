@@ -68,18 +68,20 @@ export default function SearchFilterModal({
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Filter By</Text>
         </View>
-        <FilterOption
-          label="Verse Text"
-          type="text"
-          activeSelection={currentFilter}
-          onSelect={handleFilterAndClose}
-        />
-        <FilterOption
-          label="Verse Title"
-          type="title"
-          activeSelection={currentFilter}
-          onSelect={handleFilterAndClose}
-        />
+        <View style={{ marginBottom: 20 }}>
+          <FilterOption
+            label="Verse Text"
+            type="text"
+            activeSelection={currentFilter}
+            onSelect={handleFilterAndClose}
+          />
+          <FilterOption
+            label="Verse Title"
+            type="title"
+            activeSelection={currentFilter}
+            onSelect={handleFilterAndClose}
+          />
+        </View>
       </View>
     </Modal>
   );
@@ -92,7 +94,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     position: "absolute",
     backgroundColor: "#a9a9a9ff",
-    bottom: 90,
+    bottom: 0,
     padding: 20,
   },
   titleContainer: {

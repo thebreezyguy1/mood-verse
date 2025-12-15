@@ -1,4 +1,4 @@
-import SearchFilterModal from "@/components/SearchFillterModal";
+import SearchFilterModal from "@/components/SearchFilterModal";
 import Header from "@/components/ui/Header";
 import { useBookmarks } from "@/context/BookmarksContext";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -32,6 +32,23 @@ export default function bookmarksScreen() {
     useBookmarks();
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [activeFilterType, setActiveFilterType] = useState<FilterType>("text");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const getFilteredBookmarks = () => {
+    if (!searchTerm) {
+      return bookmarks;
+    }
+
+    const lowerCaseSearch = searchTerm.toLowerCase();
+
+    return bookmarks.filter((bookmark) => {
+      const targetString =
+        activeFilterType == "text" ? bookmark.text : bookmark.title;
+      return targetString.toLowerCase().includes(lowerCaseSearch);
+    });
+  };
+
+  const filteredData = getFilteredBookmarks();
 
   // const bookmarks = [
   //   {
@@ -136,6 +153,8 @@ export default function bookmarksScreen() {
                 <TextInput
                   style={styles.searchInput}
                   placeholder="Search a bookmark..."
+                  value={searchTerm}
+                  onChangeText={setSearchTerm}
                 />
                 <Pressable onPress={openFilterModal}>
                   <FontAwesome name="filter" size={18} color="#c2c2c2" />
@@ -146,25 +165,31 @@ export default function bookmarksScreen() {
                   color="#c2c2c2"
                 />
               </View>
-              <FlatList
-                data={bookmarks}
-                renderItem={({ item }) => (
-                  <Bookmark
-                    verse={`${item.book_name}, ${item.chapter}: ${item.verse}`}
-                    date={item.date}
-                    verseText={item.text}
-                    itemId={item.id}
+              {filteredData.length > 0 ? (
+                <>
+                  <FlatList
+                    data={filteredData}
+                    renderItem={({ item }) => (
+                      <Bookmark
+                        verse={item.title}
+                        date={item.date}
+                        verseText={item.text}
+                        itemId={item.id}
+                      />
+                    )}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={styles.listContainer}
                   />
-                )}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={styles.listContainer}
-              />
-              <SearchFilterModal
-                isVisible={isFilterModalVisible}
-                onClose={() => setIsFilterModalVisible(false)}
-                onApplyFilter={handleFilterSelect}
-                currentFilter={activeFilterType}
-              />
+                  <SearchFilterModal
+                    isVisible={isFilterModalVisible}
+                    onClose={() => setIsFilterModalVisible(false)}
+                    onApplyFilter={handleFilterSelect}
+                    currentFilter={activeFilterType}
+                  />
+                </>
+              ) : (
+                <Text>No Bookmarks</Text>
+              )}
             </>
           ) : (
             <View style={styles.bookmarksEmptyContainer}>

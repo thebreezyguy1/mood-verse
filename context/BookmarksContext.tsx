@@ -70,6 +70,7 @@ export const BookmarksProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const newBookmark: Bookmark = {
       ...item,
+      title: `${item.book_name}, ${item.chapter}:${item.verse}`,
       id: id,
       date: new Date().toLocaleDateString("en-US"),
     };
