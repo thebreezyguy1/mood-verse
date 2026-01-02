@@ -82,12 +82,36 @@ export const BookmarksProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const removeBookmark = useCallback(async (id: string) => {
-    const currentBookmarks = await getStoredBookmarks();
-    const updatedBookmarks = currentBookmarks.filter((b) => b.id !== id);
+    Alert.alert(
+      "Confirm Removal",
+      "Are you sure you want to remove this bookmark?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+          onPress: () => console.log("Removal cancelled"),
+        },
+        {
+          text: "Yes, Remove",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const currentBookmarks = await getStoredBookmarks();
+              const updatedBookmarks = currentBookmarks.filter(
+                (b) => b.id !== id
+              );
 
-    setBookmarks(updatedBookmarks);
-    await saveBookmarks(updatedBookmarks);
-    Alert.alert("Removed", "Verse removed from bookmarks!");
+              setBookmarks(updatedBookmarks);
+              await saveBookmarks(updatedBookmarks);
+              Alert.alert("Removed", "Verse removed from bookmarks!");
+            } catch (error) {
+              console.error("Failed to remove bookmark:", error);
+              Alert.alert("Error", "Could not remove bookmark.");
+            }
+          },
+        },
+      ]
+    );
   }, []);
 
   const isVerseBookmarked = useCallback(

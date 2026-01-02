@@ -1,5 +1,14 @@
+import AntDesign from "@expo/vector-icons/AntDesign";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 type headerProps = {
   title: string;
@@ -10,22 +19,32 @@ const Header = (props: headerProps) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        accessibilityRole="button"
-        onPress={() => router.push("/profile")}
-      >
-        <Image
-          style={styles.profileImg}
-          source={require("../../assets/images/dorian-img.jpg")}
-        />
-      </TouchableOpacity>
+      <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
+        <TouchableOpacity
+          accessibilityRole="button"
+          onPress={() => router.push("/profile")}
+        >
+          <Image
+            style={styles.profileImg}
+            source={require("../../assets/images/dorian-img.jpg")}
+          />
+        </TouchableOpacity>
 
-      <View>
-        <Text style={{ fontSize: 20, fontWeight: "700" }}>{props.title}</Text>
         <View>
-          <Image />
-          <Text>{new Date().toDateString()}</Text>
+          <Text style={{ fontSize: 20, fontWeight: "700" }}>{props.title}</Text>
+          <View>
+            <Image />
+            <Text>{new Date().toDateString()}</Text>
+          </View>
         </View>
+      </View>
+      <View
+        style={{ flexDirection: "row-reverse", gap: 5, alignItems: "center" }}
+      >
+        <Pressable onPress={() => router.push("/settings")}>
+          <MaterialIcons name="settings" size={30} color="#fff" />
+        </Pressable>
+        <AntDesign name="logout" size={28} color="#fff" />
       </View>
     </View>
   );
@@ -38,7 +57,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "pink",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
     gap: 10,
   },

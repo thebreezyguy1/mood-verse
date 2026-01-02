@@ -1,6 +1,8 @@
 import SearchFilterModal from "@/components/SearchFilterModal";
+import SortFilterModal from "@/components/SortFilterModal";
 import Header from "@/components/ui/Header";
 import { useBookmarks } from "@/context/BookmarksContext";
+import { Bookmark } from "@/types/types";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import * as Clipboard from "expo-clipboard";
@@ -26,12 +28,17 @@ type bookmarkProps = {
 };
 
 export type FilterType = "text" | "title";
+export type SortFilterType = "asc" | "desc";
 
 export default function bookmarksScreen() {
   const { bookmarks, isLoading, removeBookmark, refreshBookmarks } =
     useBookmarks();
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+  const [isSortFilterModalVisible, setIsSortFilterModalVisible] =
+    useState(false);
   const [activeFilterType, setActiveFilterType] = useState<FilterType>("text");
+  const [activeSortFilterType, setActiveSortFilterType] =
+    useState<SortFilterType>("desc");
   const [searchTerm, setSearchTerm] = useState("");
 
   const getFilteredBookmarks = () => {
@@ -48,7 +55,26 @@ export default function bookmarksScreen() {
     });
   };
 
-  const filteredData = getFilteredBookmarks();
+  const getSortedBookmarks = (filteredBookmarks: Bookmark[]) => {
+    const sortableBookmarks = [...filteredBookmarks];
+    return sortableBookmarks.sort((a, b) => {
+      const dateA = new Date(a.date.replaceAll("/", "-"));
+      const dateB = new Date(b.date.replaceAll("/", "-"));
+
+      if (activeSortFilterType === "asc") {
+        return dateA.getTime() - dateB.getTime();
+      } else {
+        return dateB.getTime() - dateA.getTime();
+      }
+    });
+  };
+
+  const filteredAndSortedBookmarks = () => {
+    const filteredData = getFilteredBookmarks();
+    return getSortedBookmarks(filteredData);
+  };
+
+  const filteredAndSortedData = filteredAndSortedBookmarks();
 
   // const bookmarks = [
   //   {
@@ -101,8 +127,16 @@ export default function bookmarksScreen() {
     setIsFilterModalVisible(true);
   };
 
+  const openSortFilterModal = () => {
+    setIsSortFilterModalVisible(true);
+  };
+
   const handleFilterSelect = (filterType: FilterType) => {
     setActiveFilterType(filterType);
+  };
+
+  const handleSortFilterSelect = (sortFilterType: SortFilterType) => {
+    setActiveSortFilterType(sortFilterType);
   };
 
   const Bookmark = ({ verse, date, verseText, itemId }: bookmarkProps) => {
@@ -159,16 +193,18 @@ export default function bookmarksScreen() {
                 <Pressable onPress={openFilterModal}>
                   <FontAwesome name="filter" size={18} color="#c2c2c2" />
                 </Pressable>
-                <MaterialCommunityIcons
-                  name="sort-calendar-ascending"
-                  size={20}
-                  color="#c2c2c2"
-                />
+                <Pressable onPress={openSortFilterModal}>
+                  <MaterialCommunityIcons
+                    name="sort-calendar-ascending"
+                    size={20}
+                    color="#c2c2c2"
+                  />
+                </Pressable>
               </View>
-              {filteredData.length > 0 ? (
+              {filteredAndSortedData.length > 0 ? (
                 <>
                   <FlatList
-                    data={filteredData}
+                    data={filteredAndSortedData}
                     renderItem={({ item }) => (
                       <Bookmark
                         verse={item.title}
@@ -185,6 +221,12 @@ export default function bookmarksScreen() {
                     onClose={() => setIsFilterModalVisible(false)}
                     onApplyFilter={handleFilterSelect}
                     currentFilter={activeFilterType}
+                  />
+                  <SortFilterModal
+                    isVisible={isSortFilterModalVisible}
+                    onClose={() => setIsSortFilterModalVisible(false)}
+                    onApplyFilter={handleSortFilterSelect}
+                    currentFilter={activeSortFilterType}
                   />
                 </>
               ) : (

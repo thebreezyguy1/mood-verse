@@ -2,6 +2,7 @@ import { Tabs } from "expo-router";
 import React from "react";
 
 import { BookmarksProvider } from "@/context/BookmarksContext";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -74,17 +75,13 @@ export default function RootLayout() {
             }}
           />
           <Tabs.Screen
-            name="settings"
+            name="bible"
             options={{
-              title: "Settings",
+              title: "Bible",
               headerShown: false,
               tabBarIcon: ({ color, size }) => {
                 return (
-                  <MaterialCommunityIcons
-                    name="tools"
-                    size={size}
-                    color={color}
-                  />
+                  <FontAwesome5 name="book-open" size={size} color={color} />
                 );
               },
             }}

@@ -26,6 +26,13 @@ export default function RootLayout() {
             animation: "slide_from_bottom",
           }}
         />
+        <Stack.Screen
+          name="settings"
+          options={{
+            presentation: "card",
+            animation: "slide_from_right",
+          }}
+        />
       </Stack>
     </UserProvider>
   );
